@@ -8,6 +8,8 @@ public class User {
 	private String name;
 	private String email;
 	private Date birthDate;
+	private static Integer contador = 1;
+	private Integer id;
 	
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	Calendar cal = Calendar.getInstance();
@@ -17,6 +19,7 @@ public class User {
 
 	public User(String name, String email, Date birthDate) {
 		super();
+		this.id = contador++;
 		this.name = name;
 		this.email = email;
 		this.birthDate = birthDate;
@@ -46,8 +49,17 @@ public class User {
 		this.birthDate = birthDate;
 	}
 	
-	public Integer id() {
-		return 1000 + cal.get(Calendar.YEAR);
+	public Integer getId() {
+		return this.id;
 	}
 	
+	@Override
+	public String toString() {
+		return "Name: "
+				+ name
+				+ "\nE-mail: "
+				+ email
+				+ "\nDate of birth: "
+				+ sdf.format(birthDate);
+	}
 }
