@@ -18,7 +18,6 @@ public class User {
 	}
 
 	public User(String name, String email, Date birthDate) {
-		super();
 		this.id = contador++;
 		this.name = name;
 		this.email = email;

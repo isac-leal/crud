@@ -115,7 +115,7 @@ public class Program {
 		String name = sc.nextLine();
 		System.out.print("Enter the user email: ");
 		String email = sc.nextLine();
-		System.out.print("Enter the user birth age date: ");
+		System.out.print("Enter the user birth age date (dd/MM/yyyy): ");
 		Date date = sdf.parse(sc.nextLine());
 		listUsers.add(new User(name, email, date));
 		turnBack(listUsers, sdf, sc);
@@ -160,7 +160,7 @@ public class Program {
 					u.setEmail(email);
 					break;
 				case 3:
-					System.out.println("Enter the user's new date of birth");
+					System.out.println("Enter the user's new date of birth (dd/MM/yyyy):");
 					Date date = sdf.parse(sc.nextLine());
 					u.setBirthDate(date);
 					break;
