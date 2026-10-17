@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
@@ -37,74 +38,87 @@ public class Program {
 	public static void menu(List<User> listUsers, SimpleDateFormat sdf) throws ParseException {
 		Scanner sc = new Scanner(System.in);
 		int option;
-		do {
-			line();
-			System.out.println("	  MENU");
-			line();
-			System.out.println("Select an option:");
-			System.out.println("[1] - Create an user");
-			System.out.println("[2] - Show a user data");
-			System.out.println("[3] - Update a user data");
-			System.out.println("[4] - Delete an user");
-			System.out.println("[0] - Leave");
-			System.out.print("Enter: ");
-			option = sc.nextInt();
-		} while (option < 0 || option > 4);
+		try {
+			do {
+				line();
+				System.out.println("	  MENU");
+				line();
+				System.out.println("Select an option:");
+				System.out.println("[1] - Create an user");
+				System.out.println("[2] - Show a user data");
+				System.out.println("[3] - Update a user data");
+				System.out.println("[4] - Delete an user");
+				System.out.println("[0] - Leave");
+				System.out.print("Enter: ");
+				option = sc.nextInt();
+			} while (option < 0 || option > 4);
 
-		sc.nextLine();
+			sc.nextLine();
 
-		switch (option) {
-		case 1:
-			cleanConsole();
-			createUser(listUsers, sdf, sc);
-			break;
-		case 2:
-			if (listUsers.isEmpty()) {
-				line();
-				System.out.println("    Error! Empty list!");
-				line();
+			switch (option) {
+			case 1:
+				cleanConsole();
+				createUser(listUsers, sdf, sc);
+				break;
+			case 2:
+				if (listUsers.isEmpty()) {
+					line();
+					System.out.println("    Error! Empty list!");
+					line();
+					turnBack(listUsers, sdf, sc);
+					break;
+				}
+				System.out.print("Enter the user id: ");
+				int idToFind = sc.nextInt();
+				sc.nextLine();
+				showUserData(listUsers, sdf, idToFind, sc);
+				break;
+			case 3:
+				if (listUsers.isEmpty()) {
+					line();
+					System.out.println("    Error! Empty list!");
+					line();
+					turnBack(listUsers, sdf, sc);
+					break;
+				}
+				System.out.print("Enter the user id: ");
+				idToFind = sc.nextInt();
+				sc.nextLine();
+				updateUserData(listUsers, idToFind, sdf, sc);
+				break;
+			case 4:
+				if (listUsers.isEmpty()) {
+					line();
+					System.out.println("    Error! Empty list!");
+					line();
+					turnBack(listUsers, sdf, sc);
+					break;
+				}
+				System.out.print("Enter the user id: ");
+				idToFind = sc.nextInt();
+				sc.nextLine();
+				deleteUser(listUsers, sdf, idToFind, sc);
 				turnBack(listUsers, sdf, sc);
 				break;
-			}
-			System.out.print("Enter the user id: ");
-			int idToFind = sc.nextInt();
-			sc.nextLine();
-			showUserData(listUsers, sdf, idToFind, sc);
-			break;
-		case 3:
-			if (listUsers.isEmpty()) {
+			case 0:
+				cleanConsole();
 				line();
-				System.out.println("    Error! Empty list!");
+				System.out.println("	Goodbye!");
 				line();
-				turnBack(listUsers, sdf, sc);
 				break;
 			}
-			System.out.print("Enter the user id: ");
-			idToFind = sc.nextInt();
-			sc.nextLine();
-			updateUserData(listUsers, idToFind, sdf, sc);
-			break;
-		case 4:
-			if (listUsers.isEmpty()) {
-				line();
-				System.out.println("    Error! Empty list!");
-				line();
-				turnBack(listUsers, sdf, sc);
-				break;
-			}
-			System.out.print("Enter the user id: ");
-			idToFind = sc.nextInt();
-			sc.nextLine();
-			deleteUser(listUsers, sdf, idToFind, sc);
-			turnBack(listUsers, sdf, sc);
-			break;
-		case 0:
+		} catch (InputMismatchException e) {
 			cleanConsole();
 			line();
-			System.out.println("	Goodbye!");
+			System.out.println("Error: Invalid input! Press Enter to return to the menu");
 			line();
-			break;
+			sc.nextLine();
+			sc.nextLine();
+			cleanConsole();
+		} finally {
+			menu(listUsers, sdf);
 		}
+
 	}
 
 	public static void createUser(List<User> listUsers, SimpleDateFormat sdf, Scanner sc) throws ParseException {
@@ -121,7 +135,8 @@ public class Program {
 		turnBack(listUsers, sdf, sc);
 	}
 
-	public static void showUserData(List<User> listUsers, SimpleDateFormat sdf, int idToFind, Scanner sc) throws ParseException {
+	public static void showUserData(List<User> listUsers, SimpleDateFormat sdf, int idToFind, Scanner sc)
+			throws ParseException {
 		for (User u : listUsers) {
 			if (u.getId().equals(idToFind)) {
 				System.out.println(u);
@@ -133,7 +148,8 @@ public class Program {
 		turnBack(listUsers, sdf, sc);
 	}
 
-	public static void updateUserData(List<User> listUsers, int idToFind, SimpleDateFormat sdf, Scanner sc) throws ParseException {
+	public static void updateUserData(List<User> listUsers, int idToFind, SimpleDateFormat sdf, Scanner sc)
+			throws ParseException {
 		for (User u : listUsers) {
 			if (idToFind == u.getId()) {
 				line();
@@ -176,7 +192,8 @@ public class Program {
 		menu(listUsers, sdf);
 	}
 
-	public static void deleteUser(List<User> listUsers, SimpleDateFormat sdf, int idToFind, Scanner sc) throws ParseException {
+	public static void deleteUser(List<User> listUsers, SimpleDateFormat sdf, int idToFind, Scanner sc)
+			throws ParseException {
 		for (User u : listUsers) {
 			if (u.getId().equals(idToFind)) {
 				System.out.print("You are sure about your decision (y/n)? ");
@@ -203,7 +220,7 @@ public class Program {
 		}
 		menu(listUsers, sdf);
 	}
-	
+
 	public static void turnBack(List<User> list, SimpleDateFormat sdf, Scanner sc) throws ParseException {
 		System.out.print("Do you want turn back to the menu (y/n)? ");
 		char answer = sc.nextLine().charAt(0);
