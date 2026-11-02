@@ -18,6 +18,7 @@ public class Program {
 		Scanner sc = new Scanner(System.in);
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		sdf.setLenient(false);
 		List<User> listUsers = new ArrayList<>();
 
 		menu(listUsers, sdf, sc);
@@ -35,10 +36,14 @@ public class Program {
 		}
 	}
 
-	public static void menu(List<User> listUsers, SimpleDateFormat sdf, Scanner sc) throws ParseException {
+	public static void menu(List<User> listUsers, SimpleDateFormat sdf, Scanner sc) {
+
 		int option;
-		try {
-			do {
+		boolean validInput;
+		do {
+			validInput = true;
+			try {
+				// exibir o menu e ler opções
 				do {
 					line();
 					System.out.println("	  MENU");
@@ -51,71 +56,77 @@ public class Program {
 					System.out.println("[0] - Leave");
 					System.out.print("Enter: ");
 					option = sc.nextInt();
+
+					if (option < 0 || option > 4) {
+						System.out.println("Invalid option!");
+					}
 				} while (option < 0 || option > 4);
+			} catch (InputMismatchException e) {
+				// informa o erro e atribui -1 ao option para repetir o menu
+				cleanConsole();
+				line();
+				System.out.println("Error: Invalid input!");
+				option = -1;
+				validInput = false;
+				line();
+			}
+			sc.nextLine();
 
-				sc.nextLine();
-
-				switch (option) {
-				case 1:
-					cleanConsole();
-					createUser(listUsers, sdf, sc);
-					break;
-				case 2:
-					if (listUsers.isEmpty()) {
-						line();
-						System.out.println("    Error! Empty list!");
-						line();
-						break;
-					}
-					System.out.print("Enter the user id: ");
-					int idToFind = sc.nextInt();
-					sc.nextLine();
-					showUserData(listUsers, idToFind, sc);
-					break;
-				case 3:
-					if (listUsers.isEmpty()) {
-						line();
-						System.out.println("    Error! Empty list!");
-						line();
-						break;
-					}
-					System.out.print("Enter the user id: ");
-					idToFind = sc.nextInt();
-					sc.nextLine();
-					updateUserData(listUsers, idToFind, sdf, sc);
-					break;
-				case 4:
-					if (listUsers.isEmpty()) {
-						line();
-						System.out.println("    Error! Empty list!");
-						line();
-						break;
-					}
-					System.out.print("Enter the user id: ");
-					idToFind = sc.nextInt();
-					sc.nextLine();
-					deleteUser(listUsers, idToFind, sc);
-					break;
-				case 0:
-					cleanConsole();
+			switch (option) {
+			case 1:
+				cleanConsole();
+				createUser(listUsers, sdf, sc);
+				break;
+			case 2:
+				if (listUsers.isEmpty()) {
 					line();
-					System.out.println("	Goodbye!");
+					System.out.println("    Error! Empty list!");
 					line();
 					break;
 				}
-			} while (option != 0 && turnBack(sc));
-
-		} catch (InputMismatchException e) {
-			cleanConsole();
-			line();
-			System.out.println("Error: Invalid input! Press Enter to return to the menu");
-			line();
-			sc.nextLine();
-			cleanConsole();
-		}
+				System.out.print("Enter the user id: ");
+				int idToFind = sc.nextInt();
+				sc.nextLine();
+				showUserData(listUsers, idToFind);
+				break;
+			case 3:
+				if (listUsers.isEmpty()) {
+					line();
+					System.out.println("    Error! Empty list!");
+					line();
+					break;
+				}
+				System.out.print("Enter the user id: ");
+				idToFind = sc.nextInt();
+				sc.nextLine();
+				updateUserData(listUsers, idToFind, sdf, sc);
+				break;
+			case 4:
+				if (listUsers.isEmpty()) {
+					line();
+					System.out.println("    Error! Empty list!");
+					line();
+					break;
+				}
+				System.out.print("Enter the user id: ");
+				idToFind = sc.nextInt();
+				sc.nextLine();
+				deleteUser(listUsers, idToFind, sc);
+				break;
+			case 0:
+				cleanConsole();
+				line();
+				System.out.println("	Goodbye!");
+				line();
+				break;
+			}
+		} while (!validInput || (option != 0 && turnBack(sc)));
 	}
 
-	public static void createUser(List<User> listUsers, SimpleDateFormat sdf, Scanner sc) throws ParseException {
+	public static void createUser(List<User> listUsers, SimpleDateFormat sdf, Scanner sc) {
+
+		boolean validDate = false;
+
 		line();
 		System.out.println("     NEW USER DATA");
 		line();
@@ -123,39 +134,54 @@ public class Program {
 		String name = sc.nextLine();
 		System.out.print("Enter the user email: ");
 		String email = sc.nextLine();
-		System.out.print("Enter the user birth age date (dd/MM/yyyy): ");
-		Date date = sdf.parse(sc.nextLine());
-		listUsers.add(new User(name, email, date));
+		do {
+			try {
+				System.out.print("Enter the user birth age date (dd/MM/yyyy): ");
+				Date date = sdf.parse(sc.nextLine());
+				validDate = true;
+				listUsers.add(new User(name, email, date));
+			} catch (ParseException e) {
+				System.out.println("Error! Invalid date input");
+			}
+		} while (!validDate);
+
 	}
 
-	public static void showUserData(List<User> listUsers, int idToFind, Scanner sc) {
+	public static void showUserData(List<User> listUsers, int idToFind) {
 
 		User user = findUserById(idToFind, listUsers);
 
 		if (user != null) {
 			System.out.println(user);
 		} else {
-			System.out.println("ID not found");
+			System.out.println("ID not found!");
 		}
 	}
 
-	public static void updateUserData(List<User> listUsers, int idToFind, SimpleDateFormat sdf, Scanner sc)
-			throws ParseException {
+	public static void updateUserData(List<User> listUsers, int idToFind, SimpleDateFormat sdf, Scanner sc) {
 
 		User u = findUserById(idToFind, listUsers);
 
 		if (u != null) {
-			line();
-			System.out.println("         UPDATE USER DATA:");
-			line();
-			System.out.println("Select the data you wish to update:");
-			System.out.println("[1] - Name");
-			System.out.println("[2] - E-mail");
-			System.out.println("[3] - Birth Date");
-			System.out.println("[0] - EXIT");
-			System.out.print("Enter: ");
-			int option = sc.nextInt();
-			sc.nextLine();
+			int option = -1;
+			do {
+				line();
+				System.out.println("         UPDATE USER DATA:");
+				line();
+				System.out.println("Select the data you wish to update:");
+				System.out.println("[1] - Name");
+				System.out.println("[2] - E-mail");
+				System.out.println("[3] - Birth Date");
+				System.out.println("[0] - EXIT");
+				System.out.print("Enter: ");
+				option = sc.nextInt();
+				sc.nextLine();
+
+				if (option < 0 || option > 3) {
+					System.out.println("Invalid option!");
+				}
+
+			} while (option < 0 || option > 3);
 
 			switch (option) {
 			case 1:
@@ -169,9 +195,18 @@ public class Program {
 				u.setEmail(email);
 				break;
 			case 3:
-				System.out.println("Enter the user's new date of birth (dd/MM/yyyy):");
-				Date date = sdf.parse(sc.nextLine());
-				u.setBirthDate(date);
+				boolean validDate = false;
+				do {
+					try {
+						System.out.println("Enter the user's new date of birth (dd/MM/yyyy):");
+						Date date = sdf.parse(sc.nextLine());
+						validDate = true;
+						u.setBirthDate(date);
+					} catch (ParseException e) {
+						System.out.println("Error! Invalid date input");
+					}
+
+				} while (!validDate);
 				break;
 			case 0:
 				cleanConsole();
@@ -181,18 +216,19 @@ public class Program {
 				break;
 			}
 		} else {
-			System.out.println("ID not found to update data");
+			System.out.println("ID not found to update data!");
 		}
 
 	}
 
-	public static void deleteUser(List<User> listUsers, int idToFind, Scanner sc) throws ParseException {
+	public static void deleteUser(List<User> listUsers, int idToFind, Scanner sc) {
 
 		User u = findUserById(idToFind, listUsers);
 
 		if (u != null) {
 			System.out.print("You are sure about your decision (y/n)? ");
 			char answer = sc.nextLine().charAt(0);
+			answer = Character.toLowerCase(answer);
 			switch (answer) {
 			case 'y':
 				System.out.println("Deleting user...");
@@ -211,7 +247,7 @@ public class Program {
 				break;
 			}
 		} else {
-			System.out.println("ID not found to delete");
+			System.out.println("ID not found to delete!");
 		}
 
 	}
